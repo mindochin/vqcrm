@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh Lpr lFf" class="bg-grey-3">
     <q-header elevated>
       <q-toolbar>
         <q-btn
@@ -59,19 +59,18 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      content-class="bg-grey-9"
+      content-class="bg-blue-grey-10"
     >
       <q-list dark>
         <q-item to="/" exact>
           <q-item-section avatar>
-            <q-icon name="school" />
+            <q-icon name="apps" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Сводка</q-item-label>
           </q-item-section>
         </q-item>
         <q-item
-          class="GNL__drawer-item"
           v-for="link in links"
           :key="link.to"
           :to="link.to"
@@ -95,7 +94,6 @@
 <script>
 export default {
   name: 'MyLayout',
-
   data () {
     return {
       leftDrawerOpen: false,
@@ -104,6 +102,15 @@ export default {
         { to: '/2', text: 'Forum', icon: 'record_voice_over' }
       ]
     }
+  },
+  methods: {
+    logout () {}
   }
 }
 </script>
+<style lang="scss" scoped>
+.q-router-link--active {
+    color: #000;
+    background-color: $grey-4;
+}
+</style>
