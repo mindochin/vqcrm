@@ -1,108 +1,105 @@
 <template>
   <q-card class="chart-card">
-    <q-card-section class="bg-primary text-white">
+    <q-card-section class="bg-blue-grey-1 text-white1 q-pa-sm">
       <div class="text-h6">{{title}}</div>
     </q-card-section>
     <q-card-section>
-      <canvas ref="chart"></canvas>
+      <canvas
+        ref="canvas"
+        :id="safeId"
+      ></canvas>
     </q-card-section>
   </q-card>
 </template>
 <script>
 import Chart from 'chart.js'
+
 export default {
+  name: 'Chartcard',
+  props: {
+    title: { type: String, default: 'График' },
+    type: { type: String, default: 'bar' },
+    data: Object,
+    labels: [Array, String],
+    options: Object
+  },
   data () {
     return {
-      type: 'bar',
-      chart: ''
-    }
-  },
-  props: {
-    data: {
-      type: Object,
-      required: true
-    },
-    title: {
-      default () { return 'Graph' }
+      chart: null
     }
   },
   watch: {
-    data () {
-      this.startChart()
-    },
-    type () {
-      this.chart.destroy()
-      this.startChart()
+    chartConfig () {
+      this.updateChart()
     }
   },
+  mounted () {
+    this.renderChart()
+  },
+  beforeDestroy () {
+    this.destroyChart()
+  },
   computed: {
-    dataForChart () {
+    safeId () {
+      // as long as this._uid() works there is no need to generate the key
+      const key = () => Math.random().toString(36).replace('0.', '')
+      return 'chart-' + this._uid || key()
+    },
+    computedDatasets () {
+      let data = []
+      let backgroundColor = []
+      for (let key in this.data) {
+        data.push(this.data[key])
+        backgroundColor.push('rgba(' + (Math.floor(Math.random() * (255 - 0 + 1))) + ', ' + (Math.floor(Math.random() * (255 - 0 + 1))) + ', ' + (Math.floor(Math.random() * (255 - 0 + 1))) + ', 0.2)')
+      }
+      return [{ 'data': data, 'backgroundColor': backgroundColor }]// this.datasets
+    },
+    computedLabels () {
+      if (this.labels && typeof this.labels !== 'string') {
+        return this.labels
+      } else {
+        return Object.keys(this.data)
+      }
+    },
+    computedData () {
       return {
-        labels: Object.keys(this.data),
-        datasets: [{
-          data: Object.values(this.data),
-          backgroundColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)'
-          ]
-        }]
+        datasets: this.computedDatasets,
+        labels: this.computedLabels
+      }
+    },
+    computedOptions () {
+      return Object.assign({}, this.options)
+    },
+    chartConfig () {
+      return {
+        type: this.type,
+        data: this.computedData,
+        options: this.computedOptions || this.options
       }
     }
   },
   methods: {
-    startChart () {
-      // console.log(this.dataForChart)
-      // eslint-disable-next-line no-unused-vars
-      let axesStartFromZero = [{
-        ticks: {
-          beginAtZero: true
-        }
-      }]
-      this.chart = new Chart(this.$refs.chart,
-        {
-          type: 'bar',
-          data: {// this.dataForChart,
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-              label: '# of Votes',
-              data: [12, 19, 3, 5, 2, 3],
-              backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-              ],
-              borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-              ],
-              borderWidth: 1
-            }]
-          },
-          options: {
-            scales: {
-              yAxes: [{
-                ticks: {
-                  beginAtZero: true
-                }
-              }]
-            }
-          }
-        })
+    renderChart () {
+      console.log(this.chartConfig)
+      this.destroyChart()
+      this.chart = new Chart(
+        this.$refs.canvas.getContext('2d'),
+        this.chartConfig
+      )
     },
-    toImage () {
-      window.open(this.chart.toBase64Image())
+    updateChart () {
+      Object.assign(this.chart, this.chartConfig)
+      this.chart.update()
+    },
+    destroyChart () {
+      if (this.chart) {
+        this.chart.destroy()
+      }
     }
   }
 }
 </script>
+
 <style lang="scss" scoped>
 .chart-card {
   width: 100%;

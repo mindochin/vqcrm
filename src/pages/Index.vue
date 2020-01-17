@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center">
+  <q-page padding>
     <div class="row">
       <div class="col-sm-12 col-md-6">
         <card-chart
@@ -39,7 +39,7 @@ export default {
   computed: {
     dataForGraph () {
       return {
-        posts: this.totalPosts,
+        'posts': this.totalPosts,
         todos: this.totalTodos,
         comments: this.totalComments
       }
