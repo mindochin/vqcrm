@@ -4,7 +4,7 @@
       <div class="col-sm-12 col-md-6">
         <card-chart
           title="Total Graph"
-          :data="dataForGraph"
+          :datasets="dataForGraph"
         ></card-chart>
       </div>
     </div>

@@ -15,11 +15,11 @@
 import Chart from 'chart.js'
 
 export default {
-  name: 'Chartcard',
+  name: 'cardChart',
   props: {
     title: { type: String, default: 'График' },
-    type: { type: String, default: 'bar' },
-    data: Object,
+    type: { type: String, default: 'line' },
+    datasets: Object,
     labels: [Array, String],
     options: Object
   },
@@ -45,6 +45,14 @@ export default {
       const key = () => Math.random().toString(36).replace('0.', '')
       return 'chart-' + this._uid || key()
     },
+    defaultOptions () {
+      return {
+        maintainAspectRatio: false,
+        legend: {
+          display: false
+        }
+      }
+    },
     computedDatasets () {
       let data = []
       let backgroundColor = []
@@ -52,7 +60,7 @@ export default {
         data.push(this.data[key])
         backgroundColor.push('rgba(' + (Math.floor(Math.random() * (255 - 0 + 1))) + ', ' + (Math.floor(Math.random() * (255 - 0 + 1))) + ', ' + (Math.floor(Math.random() * (255 - 0 + 1))) + ', 0.2)')
       }
-      return [{ 'data': data, 'backgroundColor': backgroundColor }]// this.datasets
+      return [{ 'data': data, 'backgroundColor': backgroundColor }]
     },
     computedLabels () {
       if (this.labels && typeof this.labels !== 'string') {
@@ -68,7 +76,7 @@ export default {
       }
     },
     computedOptions () {
-      return Object.assign({}, this.options)
+      return Object.assign({}, this.defaultOptions, this.options)
     },
     chartConfig () {
       return {
